@@ -1,0 +1,35 @@
+DROP VIEW IF EXISTs dap_svc_data_gov.v_clsm_net_reserve_settled_claims;
+
+CREATE VIEW dap_svc_data_gov.v_clsm_net_reserve_settled_claims 
+AS
+SELECT distinct a.claim_number,
+       SUM(claim_transaction_amount) AS net_reserve
+FROM dap_lsm_claims_home.fact_core_claims AS a
+  LEFT JOIN dap_lsm_claims_home.dim_cost_type AS b ON CAST (b.cost_type_id AS BIGINT) = CAST (a.cost_type_id AS BIGINT)
+  LEFT JOIN dap_lsm_home.dim_claim_hist c ON CAST (a.claim_hist_id AS BIGINT) = CAST (c.claim_hist_id AS BIGINT)
+WHERE b.payment_type = 'Reserve'
+AND   c.claim_state = 'Closed'
+GROUP BY a.claim_number;
+
+GRANT SELECT
+  ON dap_svc_data_gov.v_clsm_net_reserve_settled_claims
+  TO svc_redshift_dg;
+
+ 
+
+DROP VIEW IF EXISTs dap_svc_data_gov.v_clsm_net_recovery_reserve_settled_claims;
+
+CREATE VIEW dap_svc_data_gov.v_clsm_net_recovery_reserve_settled_claims 
+AS
+SELECT distinct a.claim_number,
+       SUM(claim_transaction_amount) AS net_RecoveryReserve
+FROM dap_lsm_claims_home.fact_core_claims AS a
+  LEFT JOIN dap_lsm_claims_home.dim_cost_type AS b ON CAST (b.cost_type_id AS BIGINT) = CAST (a.cost_type_id AS BIGINT)
+  LEFT JOIN dap_lsm_home.dim_claim_hist c ON CAST (a.claim_hist_id AS BIGINT) = CAST (c.claim_hist_id AS BIGINT)
+WHERE b.payment_type = 'RecoveryReserve'
+AND   c.claim_state = 'Closed'
+GROUP BY a.claim_number;
+
+GRANT SELECT
+  ON dap_svc_data_gov.v_clsm_net_recovery_reserve_settled_claims
+  TO svc_redshift_dg;
