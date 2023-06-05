@@ -1,0 +1,17 @@
+/**
+
+Data transmission check:
+check distinct data transac lines should be equivalent to source
+ext.transactiontrn_id==fcc.transaction_reference
+ext.transacline.tli_id=fcc.dap_Source_system_id and dap_Source_system_id=cc5
+**/
+
+ 
+
+DROP materialized VIEW dap_svc_data_gov.mv_data_transmission_no_of_transaction_lines;
+CREATE materialized VIEW dap_svc_data_gov.mv_data_transmission_no_of_transaction_lines
+AS
+SELECT distinct ext_tran.tli_id,
+       fcc.dap_source_system_id
+FROM ext_curation_claim_center_5.pds_cc5_cc_transactionlineitem ext_tran
+  LEFT JOIN dap_lsm_claims_home.fact_core_claims fcc ON ext_tran.tli_id =fcc.dap_source_system_id ;
