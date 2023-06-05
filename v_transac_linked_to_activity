@@ -1,0 +1,17 @@
+DROP VIEW dap_svc_data_gov.v_transac_linked_to_activity;
+
+CREATE OR REPLACE VIEW dap_svc_data_gov.v_transac_linked_to_activity
+AS
+SELECT DISTINCT fcc.core_claim_id,
+       fcc.transaction_offset_number AS fact_core_transaction_offset_number,
+       fca.transaction_offset_number AS fact_activity_transaction_offset_number,
+       dcs.claim_activity_type_code,
+       DATEDIFF(year,activity_timestamp,getdate ())
+FROM dap_lsm_claims_home.fact_core_claims fcc
+  LEFT JOIN dap_lsm_claims_home.fact_claim_activity fca ON fcc.transaction_offset_number = fca.transaction_offset_number
+  LEFT JOIN dap_lsm_claims_home.dim_claim_activity_type dcs ON fca.activity_type_id = dcs.claim_activity_type_id
+WHERE DATEDIFF(year,activity_timestamp,getdate()) <= 3;
+
+GRANT SELECT
+  ON dap_svc_data_gov.v_transac_linked_to_activity
+  TO svc_redshift_dg;
