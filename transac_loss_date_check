@@ -1,0 +1,21 @@
+DROP VIEW IF EXISTS dap_svc_data_gov.v_clsm_trans_loss_date;
+CREATE OR REPLACE VIEW dap_svc_data_gov.v_clsm_trans_loss_date
+AS
+SELECT DISTINCT core_claim_id,
+       transaction_date_id,
+       loss_date_id,
+       date_validity
+FROM (SELECT core_claim_id,
+             transaction_date_id,
+             loss_date_id,
+             CASE
+               WHEN to_date (transaction_date_id,'YYYYMMDD',TRUE) < to_date (loss_date_id,'YYYYMMDD',TRUE) THEN 'Loss_is_greater_than_trans'
+               ELSE 'Tran_is_greater_than_loss'
+             END AS date_validity
+      FROM dap_lsm_claims_home.fact_core_claims);
+
+ 
+
+GRANT SELECT
+  ON dap_svc_data_gov.v_clsm_trans_loss_date
+  TO svc_redshift_dg;
