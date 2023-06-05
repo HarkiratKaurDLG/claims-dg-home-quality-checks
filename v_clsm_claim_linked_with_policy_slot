@@ -1,0 +1,20 @@
+DROP VIEW IF EXISTs dap_svc_data_gov.v_clsm_claim_linked_with_policy_slot;
+
+CREATE OR REPLACE VIEW dap_svc_data_gov.v_clsm_claim_linked_with_policy_slot
+AS
+SELECT DISTINCT a.claim_number,
+       a.policy_period_id,
+       b.dap_source_system_id,
+       b.policy_number,
+       b.transaction_effective_from_id,
+       b.transaction_effective_to_id,
+       CAST(Replace(CAST(CAST(a.claim_loss_time AS DATE) AS VARCHAR(11)),'-','') AS BIGINT) AS claim_loss_time
+FROM dap_lsm_home.dim_claim_hist a
+  LEFT JOIN dap_lsm_home.fact_insured_risk b
+         ON CAST (substring (a.policy_period_id,1,14) AS VARCHAR (15)) = CAST (substring (b.dap_source_system_id,1,14) AS VARCHAR (15))
+        AND a.policy_period_id <> 'BrollyPolicy';
+ 
+
+GRANT SELECT
+  ON dap_svc_data_gov.v_clsm_claim_linked_with_policy_slot
+  TO svc_redshift_dg;
