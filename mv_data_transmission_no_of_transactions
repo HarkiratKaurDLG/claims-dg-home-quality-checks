@@ -1,0 +1,15 @@
+/**
+
+Data transmission check:
+total number of transaction ids is equivalent to the total no of transaction at source
+
+ext.transactiontrn_id==fcc.transaction_reference
+**/ 
+
+DROP materialized VIEW dap_svc_data_gov.mv_data_transmission_no_of_transactions;
+CREATE materialized VIEW dap_svc_data_gov.mv_data_transmission_no_of_transactions
+AS
+SELECT distinct ext_tran.trn_id,
+       fcc.transaction_reference
+FROM ext_curation_claim_center_5.pds_cc5_cc_transaction ext_tran
+  LEFT JOIN dap_lsm_claims_home.fact_core_claims fcc ON ext_tran.trn_id = fcc.transaction_reference;
