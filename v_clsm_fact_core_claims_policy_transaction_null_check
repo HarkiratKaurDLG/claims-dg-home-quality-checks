@@ -1,0 +1,6 @@
+DROP  VIEW dap_svc_data_gov.v_clsm_fact_core_claims_policy_transaction_null_check;
+CREATE VIEW dap_svc_data_gov.v_clsm_fact_core_claims_policy_transaction_null_check
+AS 
+SELECT * FROM dap_lsm_claims_home.fact_core_claims_policy;
+
+GRANT SELECT ON dap_svc_data_gov.v_clsm_fact_core_claims_policy_transaction_null_check  TO svc_redshift_dg;
