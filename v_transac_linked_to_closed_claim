@@ -1,0 +1,20 @@
+DROP VIEW IF EXISTS dap_svc_data_gov.v_transac_linked_to_closed_claim;
+
+CREATE OR REPLACE VIEW dap_svc_data_gov.v_transac_linked_to_closed_claim
+AS
+SELECT DISTINCT dch.claim_number,
+       dch.claim_hist_id,
+       fcc.transaction_time,
+       MAX(scd_start_date) AS claim_close_date
+FROM dap_lsm_claims_home.dim_claim_hist dch
+  LEFT JOIN dap_lsm_claims_home.fact_core_claims fcc ON dch.claim_hist_id = fcc.claim_hist_id
+  LEFT JOIN dap_lsm_claims_home.fact_claim_activity fca ON fcc.transaction_offset_number = fca.transaction_offset_number
+WHERE dch.claim_state = 'Closed'
+AND   dch.dap_source_system_name = 'CC5'
+GROUP BY dch.claim_number,
+         dch.claim_hist_id,
+         fcc.transaction_time;
+         
+GRANT SELECT
+  ON dap_svc_data_gov.v_transac_linked_to_closed_claim
+  TO svc_redshift_dg;
